@@ -3,17 +3,77 @@
 <div id="app">
   <h1 v-on:click="toggleMessage">Hello, world!</h1>
   <p>{{ message }}</p>
+  <p>{{ cat }}</p>
+  <input v-model="isbn" v-bind:style="{ color: boxColor }" v-on:keyup="checkISBN" v-on:update="checkISBN"/>
 </div>
 
 <script>
+function checkISBN10(digits) {
+  console.log('ISBN-10 checking ' + digits);
+  if (digits[9].toUpperCase() == 'X') {
+    digits[9] = '10';
+  }
+  var check = 0
+  for (var i = 0; i < 10; i++) {
+    check += (10-i) * parseInt(digits[i]);
+  }
+  console.log('Checksum is ' + check);
+  console.log('Remainder is ' + check % 11);
+  return ((check % 11) == 0)
+}
+
+function checkISBN13(digits) {
+  console.log('ISBN-13 checking ' + digits);
+  if (digits[12].toUpperCase() == 'X') {
+    digits[12] = '10';
+  }
+  var check = 0
+  for (var i = 0; i < 13; i++) {
+    check += (i % 2 == 0 ? 1 : 3) * parseInt(digits[i]);
+  }
+  console.log('Checksum is ' + check);
+  console.log('Remainder is ' + check % 10);
+  return ((check % 10) == 0)
+}
+
 var app = new Vue({
   el: '#app',
   data: {
-    message: 'Hi there'
+    message: 'Hi there',
+    isbn: '',
+    cat: 'Not valid',
+    boxColor: 'red'
   },
   methods: {
     toggleMessage: function() {
       this.message = this.message == 'Hi there' ? 'Yo.' : 'Hi there';
+      this.cat = "TOGGLED";
+      this.boxColor = this.boxColor == 'green' ? 'red' : 'green';
+      this.isbn = '';
+    },
+    checkISBN: function() {
+      // clean any non-digit (or non-X) characters
+      this.isbn = this.isbn.replace(/[^\dXx]/gi, '');
+
+      // calculate checksum
+      var digits = this.isbn.split('');
+      if (this.isbn.length == 10 && checkISBN10(digits)) {
+        console.log("ISBN-10 check passed!");
+        this.cat = "ISBN-10";
+        this.boxColor = "green";
+        return true;
+      }
+      else if (this.isbn.length == 13 && checkISBN13(digits)) {
+        console.log("ISBN-13 check passed!");
+        this.cat = "ISBN-13";
+        this.boxColor = "green";
+        return true;
+      }
+
+      // not valid
+      this.cat = "Not valid";
+      this.boxColor = "red";
+      return false;
     }
   }
 });
