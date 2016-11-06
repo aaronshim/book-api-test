@@ -1,0 +1,20 @@
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+<div id="app">
+  <h1 v-on:click="toggleMessage">Hello, world!</h1>
+  <p>{{ message }}</p>
+</div>
+
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hi there'
+  },
+  methods: {
+    toggleMessage: function() {
+      this.message = this.message == 'Hi there' ? 'Yo.' : 'Hi there';
+    }
+  }
+});
+</script>
