@@ -18,7 +18,9 @@ post '/isbn' do
   http = Curl.get("https://www.googleapis.com/books/v1/volumes?q=isbn:#{params[:isbn]}&key=#{ENV['GOOGLE_BOOKS_API_KEY']}")
 
   # deal with the data we got
+  return if response['totalItems'] == 0 # how do we send error codes?
   response = JSON.parse(http.body_str)
+  puts http.body_str # hopefully we can see the response code?
   book = response['items'].first
   isbn_10 = nil
   isbn_13 = nil
@@ -37,7 +39,7 @@ post '/isbn' do
     num: response['totalItems'],
     google_books_id: book['id'],
     title: book['volumeInfo']['title'],
-    authors: book['volumeInfo']['authors'],
+    authors: book['volumeInfo']['authors'].map { |x| x.gsub(',','') }.join(','),
     date: book['volumeInfo']['publishedDate'],
     isbn_10: isbn_10,
     isbn_13: isbn_13,

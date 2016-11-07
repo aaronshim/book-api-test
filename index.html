@@ -5,10 +5,12 @@
         crossorigin="anonymous"></script>
 
 <div id="app">
-  <h1 v-on:click="toggleMessage">Hello, world!</h1>
+  <h1 v-on:click="toggleMessage">Book Finder</h1>
   <p>{{ message }}</p>
   <p>{{ isbnStatus }}</p>
   <input v-model="isbn" v-bind:style="{ color: boxColor }" v-on:keyup="checkISBN" v-on:update="checkISBN"/>
+  <br/>
+  <book v-if="bookVisible" v-bind:google-books-id="googleBooksId" v-bind:title="title" v-bind:authors="authors" v-bind:date="date" v-bind:isbn10="isbn10" v-bind:isbn13="isbn13" v-bind:pages="pages" v-bind:image-link="imageLink" />
 </div>
 
 <script>
@@ -40,13 +42,46 @@ function checkISBN13(digits) {
   return ((check % 10) == 0);
 }
 
+// to display the individual book info
+Vue.component('book',{
+  props: ['googleBooksId','title', 'authors', 'date', 'isbn10', 'isbn13', 'pages', 'imageLink'],
+  data: function() { // must always be a function
+    return { authorsList: this.authors.split(',') }
+  },
+  template: '<div> \
+  <img v-bind:src="imageLink"/> \
+  <ul> \
+  <li>{{ title }}</li> \
+  <template v-for="item in authorsList"> \
+    <li>{{ item }}</li> \
+  </template> \
+  <li>{{ date }}</li> \
+  <li>ISBN-10: {{ isbn10 }}</li> \
+  <li>ISBN-13: {{ isbn13 }}</li> \
+  <li>Google Book ID: {{ googleBooksId }}</li> \
+  <li>{{ pages }} pages</li> \
+  </ul> \
+  </div>'
+});
+
+// main instance
 var app = new Vue({
   el: '#app',
   data: {
     message: 'Hi there',
     isbn: '',
     isbnStatus: 'Not valid',
-    boxColor: 'red'
+    boxColor: 'red',
+    // book parameters from the API
+    googleBooksId: '',
+    title: '',
+    authors: '',
+    date: '',
+    isbn10: '',
+    isbn13:'',
+    pages: '',
+    imageLink: '',
+    bookVisible: false
   },
   methods: {
     toggleMessage: function() {
@@ -62,7 +97,16 @@ var app = new Vue({
         $.post("/isbn", { isbn: this.isbn }, function(data) {
           // TODO: more complex data manipulation here based on what we get back from the backend
           console.log(data);
-          this.message = "The API found " + data['num'] + " books matchig this ISBN.";
+          this.message = "The API found " + data['num'] + " book(s) matchig this ISBN.";
+          this.googleBooksId = data['google_books_id'];
+          this.title = data['title'];
+          this.authors = data['authors'];
+          this.date = data['date'];
+          this.isbn10 = data['isbn_10'];
+          this.isbn13 = data['isbn_13'];
+          this.pages = data['pages'];
+          this.imageLink = data['image_link'];
+          this.bookVisible = true;
         }.bind(this));
       }.bind(this);
 
@@ -87,6 +131,7 @@ var app = new Vue({
       // not valid
       this.isbnStatus = "Not valid";
       this.boxColor = "red";
+      this.bookVisible = false;
       return false;
     }
   }
