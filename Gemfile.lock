@@ -14,6 +14,8 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    byebug (9.0.6)
+    curb (0.9.3)
     mustermann (1.0.0.beta2)
     rack (2.0.1)
     tilt (2.0.5)
@@ -22,6 +24,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
+  curb
   sinatra!
 
 RUBY VERSION

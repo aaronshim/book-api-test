@@ -61,10 +61,11 @@ var app = new Vue({
         this.boxColor = "green";
         $.post("/isbn", { isbn: this.isbn }, function(data) {
           // TODO: more complex data manipulation here based on what we get back from the backend
-          this.message = data;
+          console.log(data);
+          this.message = "The API found " + data['num'] + " books matchig this ISBN.";
         }.bind(this));
       }.bind(this);
-      
+
       // clean any non-digit (or non-X) characters
       this.isbn = this.isbn.replace(/[^\dXx]/gi, '');
 
