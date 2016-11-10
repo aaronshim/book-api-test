@@ -110,6 +110,7 @@ var app = new Vue({
               this.isbn13 = data['isbn_13'];
               this.pages = data['pages'];
               this.imageLink = data['image_link'];
+              this.boxColor = data['book_color'];
               this.bookVisible = true;
             }.bind(this),
           error: function(error) {
