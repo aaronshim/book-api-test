@@ -94,22 +94,32 @@ var app = new Vue({
       // validation success in a function (don't forget to bind here!)
       var queryISBN = function() {
         this.boxColor = "green";
-        $.post("/isbn", { isbn: this.isbn }, function(data) {
-          // TODO: more complex data manipulation here based on what we get back from the backend
-          console.log(data);
-          this.message = "The API found " + data['num'] + " book(s) matchig this ISBN.";
-          this.googleBooksId = data['google_books_id'];
-          this.title = data['title'];
-          this.authors = data['authors'];
-          this.date = data['date'];
-          this.isbn10 = data['isbn_10'];
-          this.isbn13 = data['isbn_13'];
-          this.pages = data['pages'];
-          this.imageLink = data['image_link'];
-          this.bookVisible = true;
-        }.bind(this));
+        $.ajax({
+          url: '/isbn',
+          type: 'POST',
+          data: { isbn: this.isbn },
+          success: function(data) {
+              // TODO: more complex data manipulation here based on what we get back from the backend
+              console.log(data);
+              this.message = "The API found " + data['num'] + " book(s) matchig this ISBN.";
+              this.googleBooksId = data['google_books_id'];
+              this.title = data['title'];
+              this.authors = data['authors'];
+              this.date = data['date'];
+              this.isbn10 = data['isbn_10'];
+              this.isbn13 = data['isbn_13'];
+              this.pages = data['pages'];
+              this.imageLink = data['image_link'];
+              this.bookVisible = true;
+            }.bind(this),
+          error: function(error) {
+              // TODO: more complex error message here?
+              this.boxColor = "brown";
+              this.bookVisible = false;
+              this.message = "Book not found";
+            }.bind(this)
+        });
       }.bind(this);
-
       // clean any non-digit (or non-X) characters
       this.isbn = this.isbn.replace(/[^\dXx]/gi, '');
 
